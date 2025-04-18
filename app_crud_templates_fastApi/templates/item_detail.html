@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ item.name }}</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <h1>{{ item.name }}</h1>
+    <p>{{ item.description }}</p>
+    <p>Precio: {{ item.price }}</p>
+    <img title="photo of the item" style="position: relative; margin: 10px 10px; align-self: start; border-radius: 20px; object-fit: cover;" src="/static/{{item.photo}}" height="200px" width="200px" />
+    <br />
+    <a href="/items/">Volver a la lista</a>
+    <script src="/static/script.js"></script>
+</body>
+</html>
