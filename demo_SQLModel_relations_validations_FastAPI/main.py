@@ -2,10 +2,16 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from db.database import create_db_and_tables
-from routes import author, entry
+from routes import author, entry, category
 import uvicorn
+import logging
+from middlewares.logging import LoggingMiddleware
 
 app = FastAPI()
+
+logging.basicConfig(level=logging.INFO)
+
+app.add_middleware(LoggingMiddleware)
 
 # Crea la base de datos y las tablas al iniciar la aplicación
 @asynccontextmanager
@@ -19,6 +25,7 @@ def read_root():
 # Definir las rutas de la API
 app.include_router(author.router, prefix="/api/authors", tags=["Authors"])
 app.include_router(entry.router, prefix="/api/entries", tags=["Entries"])
+app.include_router(category.router, prefix="/api/categories", tags=["Categories"])
 
 # Manejo de excepciones globales
 @app.exception_handler(Exception)
