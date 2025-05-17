@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    # Pueder leer de fichero .env
+    env_file:
+      - .env
+    # Si no tienes un fichero .env puedes descomentar las siguientes lineas y cambiar los valores por los que necesites
+    # environment:
+    #   - DB_USER=postgres
+    #   - DB_PASSWORD=password
+    #   - DB_HOST=db
+    #   - DB_PORT=5432
+    #   - DB_NAME=app_db
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:80" # redirección del puerto de Nginx
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: app_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+

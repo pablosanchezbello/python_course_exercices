@@ -1,0 +1,57 @@
+from sqlmodel import Session, select
+from models.task_status import TaskStatus
+
+def create_task_status(session: Session, task_status: TaskStatus):
+    existing_task_status = session.exec(select(TaskStatus).where(TaskStatus.name == task_status.name)).first()
+    if existing_task_status:
+        raise ValueError(f"A task_status with name '{task_status.name}' already exists.")
+    session.add(task_status)
+    session.commit()
+    session.refresh(task_status)
+    return task_status
+
+def get_task_statuses(session: Session):
+    return session.exec(select(TaskStatus)).all()
+
+def get_task_status_by_id(session: Session, task_status_id: int):
+    return session.get(TaskStatus, task_status_id)
+
+def get_task_status_by_name(session: Session, name: str):
+    statement = select(TaskStatus).where(TaskStatus.name == name)
+    return session.exec(statement).first()
+
+def update_task_status(session: Session, task_status_id: int, task_status_data: dict):
+    task_status = session.get(TaskStatus, task_status_id)
+    if not task_status:
+        return None
+    for key, value in task_status_data.items():
+        setattr(task_status, key, value)
+    session.commit()
+    session.refresh(task_status)
+    return task_status
+
+def update_task_status_by_name(session: Session, name: str, task_status_data: dict):
+    statement = select(TaskStatus).where(TaskStatus.name == name)
+    task_status = session.exec(statement).first()
+    if not task_status:
+        return None
+    for key, value in task_status_data.items():
+        setattr(task_status, key, value)
+    session.commit()
+    session.refresh(task_status)
+    return task_status
+
+def delete_task_status(session: Session, task_status_id: int):
+    task_status = session.get(TaskStatus, task_status_id)
+    if task_status:
+        session.delete(task_status)
+        session.commit()
+    return task_status
+
+def delete_task_status_by_name(session: Session, name: str):
+    statement = select(TaskStatus).where(TaskStatus.name == name)
+    task_status = session.exec(statement).first()
+    if task_status:
+        session.delete(task_status)
+        session.commit()
+    return task_status
