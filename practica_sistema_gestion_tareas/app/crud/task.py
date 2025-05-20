@@ -2,6 +2,7 @@ from sqlmodel import Session, select
 from models.task import Task
 from models.task_status import TaskStatus
 from crud.task_status import get_task_status_by_name
+from models.todo_list import TodoList
 
 def create_task(session: Session, task: Task):
     existing_task = session.exec(select(Task).where(Task.title == task.title)).first()
@@ -24,6 +25,18 @@ def get_task_by_title(session: Session, title: str):
 
 def get_task_filtered(session: Session, todo_list_id: int, is_completed: bool, skip: int, limit: int):
     statement = select(Task)
+    if todo_list_id is not None:
+        statement = statement.where(Task.todo_list_id == todo_list_id)
+    if is_completed is not None:
+        statement = statement.where(Task.is_completed == is_completed)
+    if skip is not None and skip >= 0:
+        statement = statement.offset(skip)
+    if limit is not None and limit >= 0:
+        statement = statement.limit(limit)
+    return session.exec(statement).all()
+
+def get_task_filtered_by_username(session: Session, username: str, todo_list_id: int, is_completed: bool, skip: int, limit: int):
+    statement = select(Task).join(TodoList, TodoList.id == Task.todo_list_id).where(TodoList.owner_username == username)
     if todo_list_id is not None:
         statement = statement.where(Task.todo_list_id == todo_list_id)
     if is_completed is not None:

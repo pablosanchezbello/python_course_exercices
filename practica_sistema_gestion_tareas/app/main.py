@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
 import uvicorn
-from routes import user, todo_list, task
+from routes import user, todo_list, task, auth, task_status
 
 # Configurar el logger
 logging.basicConfig(
@@ -17,7 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Omitir logs de SQLAlchemy
-logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
 
 app = FastAPI()
 
@@ -37,10 +37,19 @@ def read_root(request: Request):
         content={"text": "Hello World!"}
     )
 
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/api/users", tags=["Users"])
 app.include_router(todo_list.router, prefix="/api/lists", tags=["Lists"])
 app.include_router(task.router, prefix="/api/tasks", tags=["Tasks"])
-app.include_router(task.router, prefix="/api/status", tags=["Status"])
+app.include_router(task_status.router, prefix="/api/status", tags=["Status"])
+
+# Manejo de excepciones globales
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred.", "error": str(exc)},
+    )
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

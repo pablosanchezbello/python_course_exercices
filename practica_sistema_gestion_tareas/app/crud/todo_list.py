@@ -29,7 +29,7 @@ def get_todo_list_filtered(session: Session, id: int, owner_id: int, username: s
     if owner_id is not None:
         statement = statement.where(TodoList.owner_id == owner_id)
     if username is not None:
-        statement = statement.where(TodoList.username == username)
+        statement = statement.where(TodoList.owner_username == username)
     if email is not None:
         statement = statement.where(TodoList.email == email)
     if skip is not None and skip >= 0:

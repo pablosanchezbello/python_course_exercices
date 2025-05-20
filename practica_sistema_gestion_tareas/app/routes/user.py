@@ -21,6 +21,8 @@ def find_all(id: int = None, username: str = None, email: str = None, skip: int 
     """
     try:
         return get_users_filtered(session, id=id, username=username, email=email, skip=skip, limit=limit)
+    except HTTPException as e:
+        raise e
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -35,6 +37,8 @@ def create(user: UserBase, session: Session = Depends(get_session)):
     try:
         user_data = User(**user.model_dump())
         return create_user(session, user_data)
+    except HTTPException as e:
+        raise e
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -58,6 +62,8 @@ def update(
         if not updated_user:
             raise HTTPException(status_code=404, detail=f"User with ID {user_id} not found")
         return updated_user
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
@@ -71,5 +77,7 @@ def update(
         if not deleted_user:
             raise HTTPException(status_code=404, detail=f"User with ID {user_id} not found")
         return deleted_user
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
