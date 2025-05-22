@@ -11,21 +11,22 @@ def create_user(session: Session, user: User):
     return user
 
 def get_users(session: Session):
-    return session.exec(select(User)).all()
+    return session.exec(select(User).where(User.username != "anonymous")).all()
 
 def get_user_by_id(session: Session, user_id: int):
-    return session.get(User, user_id)
+    return session.exec(select(User).where((User.id == user_id) & (User.username != "anonymous"))).first()
 
 def get_user_by_username(session: Session, username: str):
-    statement = select(User).where(User.username == username)
+    statement = select(User).where((User.username == username) & (User.username != "anonymous"))
     return session.exec(statement).first()
 
 def get_user_by_email(session: Session, email: str):
-    statement = select(User).where(User.email == email)
+    statement = select(User).where((User.email == email) & (User.username != "anonymous"))
     return session.exec(statement).first()
 
 def get_users_filtered(session: Session, id: int, username: str, email: str, skip: int, limit: int):
     statement = select(User)
+    statement = statement.where(User.username != "anonymous")
     if id is not None:
         statement = statement.where(User.id == id)
     if username is not None:
@@ -39,7 +40,7 @@ def get_users_filtered(session: Session, id: int, username: str, email: str, ski
     return session.exec(statement).all()
 
 def update_user(session: Session, user_id: int, user_data: dict):
-    user = session.get(User, user_id)
+    user = session.exec(select(User).where((User.id == user_id) & (User.username != "anonymous"))).first()
     if not user:
         return None
     for key, value in user_data.items():
@@ -49,7 +50,7 @@ def update_user(session: Session, user_id: int, user_data: dict):
     return user
 
 def update_user_by_username(session: Session, username: str, user_data: dict):
-    statement = select(User).where(User.username == username)
+    statement = select(User).where((User.username == username) & (User.username != "anonymous"))
     user = session.exec(statement).first()
     if not user:
         return None
@@ -60,14 +61,14 @@ def update_user_by_username(session: Session, username: str, user_data: dict):
     return user
 
 def delete_user(session: Session, user_id: int):
-    user = session.get(User, user_id)
+    user = session.exec(select(User).where((User.id == user_id) & (User.username != "anonymous"))).first()
     if user:
         session.delete(user)
         session.commit()
     return user
 
 def delete_user_by_username(session: Session, username: str):
-    statement = select(User).where(User.username == username)
+    statement = select(User).where((User.username == username) & (User.username != "anonymous"))
     user = session.exec(statement).first()
     if user:
         session.delete(user)

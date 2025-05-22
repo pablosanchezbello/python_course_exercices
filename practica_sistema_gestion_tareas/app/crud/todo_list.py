@@ -62,16 +62,22 @@ def update_todo_list_by_title(session: Session, title: str, todo_list_data: dict
 def delete_todo_list(session: Session, todo_list_id: int):
     todo_list = session.get(TodoList, todo_list_id)
     if todo_list:
-        session.delete(todo_list)
-        session.commit()
+        anonymous_user = session.exec(select(User).where(User.username == "anonymous")).first()
+        if anonymous_user:
+            todo_list.owner_id = anonymous_user.id
+            todo_list.owner_username = anonymous_user.username
+            session.commit()
     return todo_list
 
 def delete_todo_list_by_title(session: Session, title: str):
     statement = select(TodoList).where(TodoList.title == title)
     todo_list = session.exec(statement).first()
     if todo_list:
-        session.delete(todo_list)
-        session.commit()
+        anonymous_user = session.exec(select(User).where(User.username == "anonymous")).first()
+        if anonymous_user:
+            todo_list.owner_id = anonymous_user.id
+            todo_list.owner_username = anonymous_user.username
+            session.commit()
     return todo_list
 
 def get_todo_list_by_user_username(session: Session, user_username: str):

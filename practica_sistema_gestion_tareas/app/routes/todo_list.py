@@ -9,7 +9,9 @@ from auth.dependencies import require_role
 router = APIRouter()
 
 @router.post("/", response_model=TodoList, status_code=201)
-def create(todo_list: TodoListBase, session: Session = Depends(get_session), current_user: dict = Depends(require_role(["admin", "user"]))):
+def create(todo_list: TodoListBase, 
+           session: Session = Depends(get_session), 
+           current_user: dict = Depends(require_role(["admin", "user"]))):
     """
     Create a new list.
     """
@@ -24,7 +26,13 @@ def create(todo_list: TodoListBase, session: Session = Depends(get_session), cur
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 @router.get("/", response_model=list[TodoList], status_code=200)
-def find_all(id: int = None, owner_id: int = None, username: str = None, email: str = None, skip: int = None, limit: int = None, session: Session = Depends(get_session), 
+def find_all(id: int = None, 
+             owner_id: int = None, 
+             username: str = None, 
+             email: str = None, 
+             skip: int = None, 
+             limit: int = None, 
+             session: Session = Depends(get_session), 
              current_user: dict = Depends(require_role(["admin", "user", "viewer"]))):
     """
     Find all todoLists in the system.

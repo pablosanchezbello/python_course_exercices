@@ -5,6 +5,7 @@ from models.task_status import TaskStatus, TaskStatusBase
 from db.database import get_session
 from crud.task_status import create_task_status, delete_task_status, get_task_statuses, update_task_status
 from auth.dependencies import require_role
+from exceptions.status_task_in_use import StatusTaskInUseException
 
 router = APIRouter()
 
@@ -27,7 +28,8 @@ def create(task_status: TaskStatusBase,
 
 
 @router.get("/", response_model=list[TaskStatus], status_code=200)
-def find_all(session: Session = Depends(get_session), current_user: dict = Depends(require_role(["admin", "user"])),):
+def find_all(session: Session = Depends(get_session), 
+             current_user: dict = Depends(require_role(["admin", "user"])),):
     """
     Find all tasks status in the system.
     """
@@ -77,6 +79,8 @@ def update(
         if not deleted_task_status:
             raise HTTPException(status_code=404, detail=f"Task with ID {task_status_id} not found")
         return deleted_task_status
+    except StatusTaskInUseException as e:
+        raise HTTPException(status_code=403, detail=f"Fobidden due to task status still in use: {str(e)}")
     except HTTPException as e:
         raise e
     except Exception as e:

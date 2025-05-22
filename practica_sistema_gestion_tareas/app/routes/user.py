@@ -1,15 +1,22 @@
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlmodel import Session
-from models.user import User, UserBase, UserResponse
+from models.user import User, UserCreate, UserResponse
 from db.database import get_session
 from crud.user import create_user, delete_user, get_users_filtered, update_user
+from auth.dependencies import require_role
 
 
 router = APIRouter()
 
 @router.get("/", response_model=list[UserResponse], status_code=200)
-def find_all(id: int = None, username: str = None, email: str = None, skip: int = None, limit: int = None, session: Session = Depends(get_session)):
+def find_all(id: int = None, 
+             username: str = None, 
+             email: str = None, 
+             skip: int = None, 
+             limit: int = None, 
+             session: Session = Depends(get_session),
+             current_user: dict = Depends(require_role(["admin"])),):
     """
     Find all users in the system.
     Filter options as queryParams:
@@ -30,7 +37,9 @@ def find_all(id: int = None, username: str = None, email: str = None, skip: int 
 
 
 @router.post("/", response_model=UserResponse, status_code=201)
-def create(user: UserBase, session: Session = Depends(get_session)):
+def create(user: UserCreate, 
+           session: Session = Depends(get_session),
+           current_user: dict = Depends(require_role(["admin"])),):
     """
     Create a new user in the system.
     """
@@ -56,6 +65,7 @@ def update(
         }
     ),
     session: Session = Depends(get_session),
+    current_user: dict = Depends(require_role(["admin"])),
 ):
     try:
         updated_user = update_user(session, user_id, user_data)
@@ -71,6 +81,7 @@ def update(
 def update(
     user_id: int,
     session: Session = Depends(get_session),
+    current_user: dict = Depends(require_role(["admin"])),
 ):
     try:
         deleted_user = delete_user(session, user_id)

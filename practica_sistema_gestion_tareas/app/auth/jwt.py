@@ -2,6 +2,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 
+from auth.redis import is_token_revoked
+
 SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")
 REFRESH_SECRET_KEY = os.getenv("REFRESH_SECRET_KEY", "your_refresh_secret_key")
 ALGORITHM = "HS256"
@@ -37,7 +39,7 @@ def create_refresh_token(data: dict):
 
 def verify_access_token(token: str):
     try:
-        if token in revoked_tokens:  # Verificar si el token está revocado
+        if token in revoked_tokens or is_token_revoked(token):  # Verificar si el token está revocado
             raise JWTError("Token has been revoked")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload

@@ -2,12 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, Form, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
 from sqlmodel import Session
-from auth.jwt import create_access_token, create_refresh_token, verify_refresh_token, revoke_token, verify_access_token
+from auth.jwt import create_access_token, create_refresh_token, verify_refresh_token, verify_access_token
+from auth.jwt import revoke_token as revoke_token_memory
 from auth.hashing import hash_password, verify_password
 from db.database import get_session
 from auth.dependencies import get_current_user, oauth2_scheme
 from models.user import UserBase, UserCreate, UserResponse, User
 from crud.user import get_user_by_email, get_user_by_username
+from auth.redis import revoke_token as revoke_token_redis
 
 router = APIRouter()
 
@@ -66,7 +68,8 @@ def logout(current_user: dict = Depends(get_current_user), token: str = Depends(
     session.commit()
 
     # Revocar el token de acceso
-    revoke_token(token)
+    revoke_token_memory(token)
+    revoke_token_redis(token)
 
     return {"message": "Successfully logged out"}
 
