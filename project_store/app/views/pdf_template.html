@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data for {{city}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Weather Data for {{city}}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Temperature</th>
+                <th>Humidity</th>
+                <th>Rain</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in weather_data %}
+            <tr>
+                <td>{{ data.time }}</td>
+                <td>
+                    <div>
+                        {{ data.temperature }}
+                        {% if data.temperature < 15 %}
+                            <img src="./static/thermometer-blue.svg" alt="Blue thermometer" height="30px" style="margin-left: 30px;" />
+                        {% elif data.temperature >= 15 and data.temperature <= 25 %}
+                            <img src="./static/thermometer-yellow.svg" alt="Yellow thermometer" height="30px" style="margin-left: 30px;" />
+                        {% else %}
+                            <img src="./static/thermometer-red.svg" alt="Red thermometer" height="30px" style="margin-left: 30px;" />
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ data.humidity }}</td>
+                <td>{{ data.rain }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
