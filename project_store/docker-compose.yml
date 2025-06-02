@@ -3,7 +3,7 @@ version: "3.9"
 services:
   backend:
     build:
-      context: .
+      context: ./app/
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
@@ -32,6 +32,13 @@ services:
     ports:
       - "6379:6379"
     command: ["redis-server"]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:80" # redirection of Nginx port
 
 volumes:
   postgres_data:

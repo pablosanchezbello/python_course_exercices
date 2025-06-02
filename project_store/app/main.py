@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
 import uvicorn
 from routes import order, order_item, product, user, auth
+from fastapi.middleware.cors import CORSMiddleware
 
 # Configurar el logger
 logging.basicConfig(
@@ -20,6 +21,14 @@ logger = logging.getLogger(__name__)
 logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4000"],  # Frontend origin (adjust as needed)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Middleware para registrar solicitudes y respuestas
 @app.middleware("http")
