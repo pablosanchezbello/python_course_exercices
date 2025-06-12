@@ -3,12 +3,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
 import uvicorn
-from routes import order, order_item, product, user, auth
+from routes import order, order_item, product, user, auth, export, stats
 from fastapi.middleware.cors import CORSMiddleware
 
 # Configurar el logger
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler("app.log"),
@@ -49,8 +49,10 @@ def read_root(request: Request):
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/api/users", tags=["Users"])
 app.include_router(order.router, prefix="/api/orders", tags=["Orders"])
-app.include_router(order_item.router, prefix="/orders/{order_id}/items", tags=["Order Items"])
+app.include_router(order_item.router, prefix="/api/orders/{order_id}/products", tags=["Order Items"])
 app.include_router(product.router, prefix="/api/products", tags=["Products"])
+app.include_router(export.router, prefix="/api/exports", tags=["Exports"])
+app.include_router(stats.router, prefix="/api/stats", tags=["Stats"])
 
 # Manejo de excepciones globales
 @app.exception_handler(Exception)

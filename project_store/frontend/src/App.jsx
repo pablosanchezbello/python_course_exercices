@@ -4,8 +4,6 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 
 function App() {
-  const [entries, setEntries] = useState([]);
-
   return (
     <Router>
       <Routes>

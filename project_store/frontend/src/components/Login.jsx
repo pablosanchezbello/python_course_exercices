@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./../App.css";
 
@@ -8,6 +8,12 @@ function Login({ setEntries }) {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const API_URL = "http://localhost:8000/api/auth";
+
+  useEffect(() => {
+      if (localStorage.getItem("access_token")) {
+          navigate("/dashboard");
+      }
+  }, []);
 
   const doLogin = () => {
     const params = new URLSearchParams();

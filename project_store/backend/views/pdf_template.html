@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data for {{city}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Orders Data</h1>
+    {% for data in order_data %}
+    {% set ns = namespace(total=0) %}
+        <h2>Order ID: {{ data.order_id }}</h2>
+        <h3>List of products</h3>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th style="width: 40%;">Title</th>
+                    <th>Quantity</th>
+                    <th>Price / unit (€)</th>
+                    <th>Price (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in data.products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.title }}</td>
+                        <td>{{ product.quantity }}</td>
+                        <td>{{ '%.2f' % product.price }}</td>
+                        <td>{{ '%.2f' % (product.quantity * product.price) }}</td>
+                    </tr>
+                {% set ns.total = ns.total + (product.quantity * product.price) %}
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>
+            Total cost of the order: {{ '%.2f' % ns.total }} €
+        </h3>
+    {% endfor %}
+</body>
+</html>

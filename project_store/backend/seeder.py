@@ -18,7 +18,8 @@ def seed_data():
             user0 = User(username="anonymous", email="anonymous@example.com", hashed_password=hash_password("anonymous"))
             user1 = User(username="user1", email="user1@example.com", hashed_password=hash_password("password1"))
             user2 = User(username="user2", email="user2@example.com", hashed_password=hash_password("password2"))
-            session.add_all([user0, user1, user2])
+            admin1 = User(username="admin1", email="admin1@example.com", hashed_password=hash_password("password1"), role="admin")
+            session.add_all([user0, user1, user2, admin1])
             session.commit()
         except Exception as e:
             print(f"Error creating users: {e}")

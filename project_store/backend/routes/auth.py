@@ -35,8 +35,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = D
     user = get_user_by_username(session, form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_access_token({"sub": user.username, "user_id": user.id}, role=user.role)
-    refresh_token = create_refresh_token({"sub": user.username, "user_id": user.id})
+    token = create_access_token({"sub": user.username, "user_id": user.id, "user_username": user.username}, role=user.role)
+    refresh_token = create_refresh_token({"sub": user.username, "user_id": user.id, "user_username": user.username})
     user.refresh_token = refresh_token
     session.add(user)
     session.commit()
@@ -55,7 +55,7 @@ def refresh_token(refresh_token: str, session: Session = Depends(get_session)):
     user = get_user_by_username(session, payload["sub"])
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    new_access_token = create_access_token({"sub": user.username, "user_id": user.id}, role=user.role)
+    new_access_token = create_access_token({"sub": user.username, "user_id": user.id, "user_username": user.username}, role=user.role)
     return {"access_token": new_access_token, "token_type": "bearer"}
 
 @router.post("/logout")

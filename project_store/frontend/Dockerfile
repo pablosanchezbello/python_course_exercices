@@ -18,6 +18,9 @@ FROM nginx:1.23
 # Copia los archivos construidos al directorio de Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Copia la configuración personalizada de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expone el puerto 80
 EXPOSE 80
 

@@ -1,5 +1,6 @@
 import httpx
 import logging
+from utils.product_redis import store_product, retrieve_product
 
 # Configurar el logger
 logging.basicConfig(
@@ -56,13 +57,17 @@ async def fetch_product_by_id(id: str):
     """
     url = f"https://dummyjson.com/products/{id}?select=id,title,description,price"
     try:
-        async with httpx.AsyncClient(verify=False) as client:
-            response = await client.get(url, timeout=10.0)
-            response.raise_for_status()
-            data = response.json()
-            logger.info(f"Producto obtenido: {data}")
-
-            return data
+        product = retrieve_product(id)
+        if product is None:
+            async with httpx.AsyncClient(verify=False) as client:
+                response = await client.get(url, timeout=10.0)
+                response.raise_for_status()
+                data = response.json()
+                logger.info(f"Producto obtenido: {data}")
+                store_product(data)
+                return data
+        else:
+            return product
         
     except httpx.RequestError as e:
         raise Exception(f"Error de conexión al consultar la API externa: {str(e)}")

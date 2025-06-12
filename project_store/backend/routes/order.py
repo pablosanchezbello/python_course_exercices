@@ -13,13 +13,13 @@ from utils.api_dummy_products import fetch_product_by_id
 router = APIRouter()
 
 @router.post("/", response_model=Order, status_code=201)
-def create(order: OrderBase, 
-           session: Session = Depends(get_session), 
+def create(session: Session = Depends(get_session), 
            current_user: dict = Depends(require_role(["admin", "cliente"]))):
     """
     Create a new order without products associated to it.
     """
     try:
+        order = OrderBase(status="in progress", user_id=current_user["user_id"])
         order_data = Order(**order.model_dump())
         order_data.user_id = current_user["user_id"]
         return create_order(session, order_data)
@@ -75,9 +75,8 @@ async def find_all(id: int = None,
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
-
 @router.get("/{order_id}", response_model=OrderResponse)
-async def update(
+async def get_order_by_id(
     order_id: int,
     session: Session = Depends(get_session),
     current_user: dict = Depends(require_role(["admin", "cliente"])),
@@ -121,20 +120,18 @@ def update(
     order_data: OrderBase = Body(
         ...,
         examples={
-            "status": "Order status (in progress, paid, delivered, cancelled)"
+            "status": "Order status (in progress, paid, delivered, cancelled)",
+            "user_id": "ID of the order's User ID"
         }
     ),
     session: Session = Depends(get_session),
-    current_user: dict = Depends(require_role(["admin", "cliente"])),
+    current_user: dict = Depends(require_role(["admin"])),
 ):
     """
     Update an existing order.
     """
     try:
-        if current_user["role"] == "admin" :
-            return update_order(session, order_id, order_data.model_dump())
-        else:
-            return update_order(session, order_id, order_data.model_dump(), current_user["user_id"])
+        return update_order(session, order_id, order_data.model_dump())
     except HTTPException as e:
         raise e
     except ValueError as e:

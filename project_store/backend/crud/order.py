@@ -1,4 +1,4 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, text
 from models.order import Order
 from models.user import User
 from crud.user import get_user_by_id
@@ -30,7 +30,7 @@ def get_orders_filtered(session: Session, id: int, user_id: int, skip: int, limi
         statement = statement.offset(skip)
     if limit is not None and limit >= 0:
         statement = statement.limit(limit)
-    return session.exec(statement).all()
+    return session.exec(statement.order_by(Order.id.asc())).all()
 
 def update_order(session: Session, order_id: int, order_data: dict):
     order = session.get(Order, order_id)
@@ -50,7 +50,6 @@ def delete_order(session: Session, order_id: int, user_id: int):
         anonymous_user = session.exec(select(User).where(User.username == "anonymous")).first()
         if anonymous_user:
             order.user_id = anonymous_user.id
-            order.owner_username = anonymous_user.username
             session.commit()
     return order
 
@@ -60,3 +59,6 @@ def get_order_by_user_id(session: Session, user_id: int):
         return []
     statement = select(Order).where(Order.user_id == user.id)
     return session.exec(statement).all()
+
+def get_orders_by_users(session: Session):
+    return session.exec(text('SELECT user_id, COUNT(*) as order_count FROM "order" GROUP BY user_id')).all()
