@@ -41,4 +41,4 @@ project_store
 ```
 
 ## DEMO
-[Video demo](demo.gif)
+![Video demo](https://github.com/pablosanchezbello/python_course_exercices/blob/main/project_store/demo.gif)
