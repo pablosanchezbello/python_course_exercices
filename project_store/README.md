@@ -41,4 +41,4 @@ project_store
 ```
 
 ## DEMO
-[Video demo](demo.mp4)
+[Video demo](demo.webm)
