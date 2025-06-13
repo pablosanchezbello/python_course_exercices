@@ -39,3 +39,10 @@ project_store
 ├── docker-compose.yml          # Docker compose file to build full project
 └── README.md                   # Documentación del proyecto
 ```
+
+## DEMO
+
+<video width="320" height="240" controls>
+  <source src="demo.mp4" type="video/mp4">
+  Tu navegador no soporta el elemento de video.
+</video>
